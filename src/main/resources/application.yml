@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: spring-data-jpa
+
+  datasource:
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: 1111
+    url: jdbc:h2:tcp://localhost/~/springdatajpa
+
+
+  h2:
+    console:
+      path: /h2-console
+      enabled: true
+
+  jpa:
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+    hibernate:
+      ddl-auto: create
+
+#logging:
+#  level:
+#    org.hibernate.sql: trace
