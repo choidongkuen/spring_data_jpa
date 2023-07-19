@@ -21,7 +21,7 @@ class MemberRepositoryTest {
     @Test
     @DisplayName("jpa test")
     public void testMember() {
-        Member member = new Member("최동근");
+        Member member = new Member("최동근", 2);
         System.out.println("==저장 전");
         Member save = this.memberRepository.save(member); // 저장 하기 전 먼저 id 조회 + 저장
         System.out.println("==저장 후==");
