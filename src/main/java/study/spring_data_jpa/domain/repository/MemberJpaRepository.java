@@ -51,4 +51,35 @@ public class MemberJpaRepository {
                 .setParameter("age", age)
                 .getResultList();
     }
+
+    /*
+     검색 조건 : 나이가 10살
+     정렬 조건 : 이름 내림차순
+     페이징 조건 : 첫번째 페이지, 페이지당 보여줄 데이터는 3건
+     # offset : 몇번째 페이지
+     # limit : 몇개 데이터
+     */
+    public List<Member> findByPage(int age, int offset, int limit) {
+        return em.createQuery("select m from Member m where m.age = :age order by m.username desc", Member.class)
+                .setParameter("age", age)
+                .setFirstResult(offset)
+                .setMaxResults(limit)
+                .getResultList();
+    }
+
+    public List<Member> findAllSorting(int age) {
+        return em.createQuery("select m from Member m where m.age = :age order by m.username desc", Member.class)
+                .setParameter("age", age)
+                .getResultList();
+    }
+
+    /*
+       총 데이터 개수
+     */
+
+    public long totalCount(int age) {
+        return em.createQuery("select count(m) from  Member m where m.age = :age", Long.class)
+                .setParameter("age", age)
+                .getSingleResult();
+    }
 }

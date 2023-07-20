@@ -70,4 +70,22 @@ class MemberJpaRepositoryTest {
         assertThat(result.size()).isLessThan(5);
         assertThat(result.get(0).getUsername()).isEqualTo("최동근");
     }
+
+    @Test
+    public void paging() {
+        for (int i = 0; i < 20; i++) {
+            this.memberJpaRepository.save(new Member(String.valueOf(i + 1), 10));
+        }
+
+        System.out.println("20 데이터 저장 완료 !!");
+
+        int age = 10;
+        int offset = 0;
+        int limit = 3;
+
+        List<Member> members = this.memberJpaRepository.findByPage(age, offset, limit);
+        List<Member> sortedMembers = this.memberJpaRepository.findAllSorting(age);
+        long totalCount = memberJpaRepository.totalCount(age);
+        System.out.println("100 데이터 조회 완료 !!");
+    }
 }

@@ -8,6 +8,7 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import study.spring_data_jpa.domain.entity.Member;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -51,6 +52,8 @@ class MemberRepositoryTest {
         Member 박건구 = this.memberRepository.findAllByUsernameAndAge("박건구", 30);
 
         List<String> result = memberRepository.findAllByUsernameWithNamedQuery();
+
+        List<Member> results = memberRepository.findByNames(Arrays.asList("최동근", "박건구"));
         System.out.println("Query is over");
 
     }
