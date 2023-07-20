@@ -4,6 +4,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import study.spring_data_jpa.domain.entity.Member;
@@ -58,4 +61,26 @@ class MemberRepositoryTest {
 
     }
 
+    @Test
+    public void paging() {
+        for (int i = 0; i < 20; i++) {
+            this.memberRepository.save(new Member(String.valueOf(i + 1), 10));
+        }
+
+        System.out.println("20 데이터 저장 완료 !!");
+
+        int age = 10;
+        int offset = 1;
+        int limit = 3;
+
+        Page<Member> members
+                = this.memberRepository.findByAge(age, PageRequest.of(offset, 3, Sort.by(Sort.Direction.DESC, "username")));
+        // total count 쿼리 날림
+
+        List<Member> list = members.getContent();
+//        int totalPages = members.getTotalPages();
+        System.out.println("100 데이터 조회 완료 !!");
+        assertThat(members.getSize()).isEqualTo(3);
+        assertThat(members.getTotalPages()).isEqualTo(7); // 1 ~ 7
+    }
 }
