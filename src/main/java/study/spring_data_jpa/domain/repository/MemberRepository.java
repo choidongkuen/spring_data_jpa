@@ -1,7 +1,10 @@
 package study.spring_data_jpa.domain.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import study.spring_data_jpa.domain.entity.Member;
+import study.spring_data_jpa.dto.MemberDto;
 
 import java.util.List;
 
@@ -13,4 +16,15 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     List<Member> findTop1ByUsernameAndAgeGreaterThan(String username, int age);
 
     Member findHelloByUsername(String username);
+
+    @Query("select m from Member m where m.username = :username and m.age = :age")
+    Member findByMembersss(@Param("username") String username, @Param("age") int age);
+
+    Member findAllByUsernameAndAge(String username, int age);
+
+    @Query("select m.username from Member m")
+    List<String> findAllByUsernameWithNamedQuery();
+
+    @Query("select new study.spring_data_jpa.dto.MemberDto(m.id,m.username,m.age) from Member m")
+    List<MemberDto> findMemberDto();
 }

@@ -46,6 +46,13 @@ class MemberRepositoryTest {
         List<Member> members = this.memberRepository.findTop1ByUsernameAndAgeGreaterThan("최동근", 2);
 
         Member member = this.memberRepository.findHelloByUsername("박건구");
+        Member memberss = this.memberRepository.findByMembersss("박건구", 2);
         System.out.println("-=");
+        Member 박건구 = this.memberRepository.findAllByUsernameAndAge("박건구", 30);
+
+        List<String> result = memberRepository.findAllByUsernameWithNamedQuery();
+        System.out.println("Query is over");
+
     }
+
 }
