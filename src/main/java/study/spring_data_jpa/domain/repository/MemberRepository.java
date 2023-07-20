@@ -2,6 +2,7 @@ package study.spring_data_jpa.domain.repository;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -42,4 +43,15 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Modifying(clearAutomatically = true)
     @Query("update Member m set m.age = m.age + 1 where m.age >:age")
     int bulkAgePlus(@Param("age") int age);
+
+    @Query("select m from Member m join fetch m.team t")
+    List<Member> findMemberFetchJoin();
+
+    // JPQL 없이 페치 조인을 사용 -> 개발자는 굳이 JPQL 을 직접 사용할 필요 x
+    @Override
+    @EntityGraph(attributePaths = {"team"})
+    List<Member> findAll();
+
+    @EntityGraph(attributePaths = {"team"})
+    Member findEntityGraphByUsername(String username);
 }

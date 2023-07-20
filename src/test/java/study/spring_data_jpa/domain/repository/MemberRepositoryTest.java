@@ -1,5 +1,6 @@
 package study.spring_data_jpa.domain.repository;
 
+import org.hibernate.Hibernate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import study.spring_data_jpa.domain.entity.Member;
+import study.spring_data_jpa.domain.entity.Team;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -26,6 +28,8 @@ class MemberRepositoryTest {
 
     @Autowired
     private MemberRepository memberRepository;
+    @Autowired
+    private TeamRepository teamRepository;
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -107,5 +111,69 @@ class MemberRepositoryTest {
         // 영속성 컨텍스트의 데이터를 가져올텐데 이때 [최동근1 의 나이는 그대로 12살]
         Optional<Member> foundMember = memberRepository.findById(1L);
         assertThat(resultCount).isNotEqualTo(-3);
+    }
+
+    @Test
+    @DisplayName("FETCH JOIN TEST")
+    void findMemberByLazy() {
+        // given
+        Team teamA = new Team("TEAM_A");
+        Team teamB = new Team("TEAM_B");
+
+        teamRepository.save(teamA);
+        teamRepository.save(teamB);
+
+        // when
+        this.memberRepository.save(new Member("USER_A", 20, teamA));
+        this.memberRepository.save(new Member("USER_A", 20, teamA));
+        this.memberRepository.save(new Member("USER_A", 20, teamB));
+        this.memberRepository.save(new Member("USER_A", 20, teamB));
+        this.memberRepository.save(new Member("USER_A", 20, teamB));
+
+        entityManager.flush();
+        entityManager.clear();
+        // then
+
+//        List<Member> members = memberRepository.findAll(); // 지연로딩 제외하고 해당 객체만 가져옴
+        List<Member> memberList = memberRepository.findMemberFetchJoin(); // inner join 으로 모두 가져옴
+
+
+        for (Member member : memberList) {
+            System.out.println("member.getUsername() = " + member.getUsername());
+            System.out.println("member.team = " + member.getTeam()); // 지연로딩이기 때문에 이 시점에 실제 TEAM 관련 쿼리가 나간다.(N + 1)
+            System.out.println("member.team.class" + member.getTeam().getClass()); // 초기화 되어도 프록시 객체가 실제 객체로 바뀌지는 않는다.
+            boolean initialized = Hibernate.isInitialized(member.getTeam());// 지연 로딩 여부를 확인 가능(true)
+            System.out.println("======");
+            System.out.println(initialized);
+        }
+        System.out.println("===");
+    }
+
+    @Test
+    @DisplayName("Entity Grapth TEST")
+    void entityGraphTest() {
+        // given
+        Team teamA = new Team("TEAM_A");
+        Team teamB = new Team("TEAM_B");
+
+        teamRepository.save(teamA);
+        teamRepository.save(teamB);
+
+        // when
+        this.memberRepository.save(new Member("USER_A", 20, teamA));
+        this.memberRepository.save(new Member("USER_A", 20, teamA));
+        this.memberRepository.save(new Member("USER_A", 20, teamB));
+        this.memberRepository.save(new Member("USER_A", 20, teamB));
+        this.memberRepository.save(new Member("USER_A", 20, teamB));
+
+        List<Member> members = memberRepository.findAll();
+        for (Member member : members) {
+            System.out.println("member.getUsername() = " + member.getUsername());
+            System.out.println("member.team = " + member.getTeam());
+            System.out.println("member.team.class = " + member.getTeam().getClass());
+            boolean initialized = Hibernate.isInitialized(member.getTeam());
+            System.out.println("====");
+        }
+        System.out.println("===");
     }
 }
