@@ -88,4 +88,21 @@ class MemberJpaRepositoryTest {
         long totalCount = memberJpaRepository.totalCount(age);
         System.out.println("100 데이터 조회 완료 !!");
     }
+
+    @Test
+    @DisplayName("벌크성 수정 쿼리 테스트")
+    void bulkUpdate() {
+        // given
+        memberJpaRepository.save(new Member("member1", 23));
+        memberJpaRepository.save(new Member("member2", 50));
+        memberJpaRepository.save(new Member("member3", 22));
+
+        // when
+        int resultCount = memberJpaRepository.bulkAgePlus(2);
+        System.out.println("벌크성 쿼리 완료 나이 + 1");
+
+        // then
+        Member member = this.memberJpaRepository.find(1);
+        assertThat(resultCount).isEqualTo(3);
+    }
 }

@@ -11,8 +11,11 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import study.spring_data_jpa.domain.entity.Member;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -23,6 +26,8 @@ class MemberRepositoryTest {
 
     @Autowired
     private MemberRepository memberRepository;
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Test
     @DisplayName("jpa test")
@@ -78,9 +83,29 @@ class MemberRepositoryTest {
         // total count 쿼리 날림
 
         List<Member> list = members.getContent();
-//        int totalPages = members.getTotalPages();
         System.out.println("100 데이터 조회 완료 !!");
         assertThat(members.getSize()).isEqualTo(3);
         assertThat(members.getTotalPages()).isEqualTo(7); // 1 ~ 7
+    }
+
+    @Test
+    public void bulkUpdate() {
+        memberRepository.save(new Member("최동근1", 12));
+        memberRepository.save(new Member("박건구1", 20));
+        memberRepository.save(new Member("지승현1", 25));
+        memberRepository.save(new Member("권충근2", 30));
+        // 영속성 컨텍스트 already not in db
+
+        // 영속성 컨텍스트 무시하고 바로 DB 반영!!
+        // @Modifying(clearAutomatically = true) -> 초기화
+        int resultCount = memberRepository.bulkAgePlus(10);
+
+        entityManager.flush(); // 영속성 컨텍스트 모두 DB 반영
+        entityManager.clear(); // 초기화
+
+
+        // 영속성 컨텍스트의 데이터를 가져올텐데 이때 [최동근1 의 나이는 그대로 12살]
+        Optional<Member> foundMember = memberRepository.findById(1L);
+        assertThat(resultCount).isNotEqualTo(-3);
     }
 }
