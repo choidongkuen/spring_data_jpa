@@ -8,6 +8,8 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import study.spring_data_jpa.domain.entity.Member;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
@@ -28,5 +30,22 @@ class MemberRepositoryTest {
         Member findMember = this.memberRepository.findById(save.getId()).get();
         System.out.println("== 조회 후 ==");
         assertThat(findMember).isEqualTo(findMember);
+    }
+
+    @Test
+    public void findByUsernameAndAgeGraterThanAge() {
+        Member m1 = new Member("최동근", 12);
+        Member m2 = new Member("박건구", 30);
+        Member m3 = new Member("최동근", 20);
+
+        this.memberRepository.save(m1);
+        this.memberRepository.save(m2);
+        this.memberRepository.save(m3);
+
+        // find 인지 findAll 인지 중요한게 아니라 반환타입에 따라 결정 if 여러개면 List 로 해여함
+        List<Member> members = this.memberRepository.findTop1ByUsernameAndAgeGreaterThan("최동근", 2);
+
+        Member member = this.memberRepository.findHelloByUsername("박건구");
+        System.out.println("-=");
     }
 }

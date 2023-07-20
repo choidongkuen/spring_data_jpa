@@ -1,5 +1,6 @@
 package study.spring_data_jpa.domain.repository;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -44,5 +45,29 @@ class MemberJpaRepositoryTest {
         // 리스트 조회 검증
         List<Member> members = memberJpaRepository.findAll();
         assertThat(members.size()).isEqualTo(3);
+    }
+
+    @Test
+    @DisplayName("findByUsernameAndAgeGreaterThan")
+    void findByUsernameAndAgeGreaterThen() {
+        // given
+        Member m1 = new Member("최동근", 27);
+        Member m2 = new Member("최동근", 22);
+        Member m3 = new Member("최동근", 22);
+        Member m4 = new Member("최동근", 13);
+        Member m5 = new Member("최동근", 6);
+
+        memberJpaRepository.save(m1);
+        memberJpaRepository.save(m2);
+        memberJpaRepository.save(m3);
+        memberJpaRepository.save(m4);
+        memberJpaRepository.save(m5);
+        // when
+
+        List<Member> allMembers = memberJpaRepository.findAll();
+        List<Member> result = memberJpaRepository.findByUsernameAndAgeGreaterThen("최동근", 13);
+        // then
+        assertThat(result.size()).isLessThan(5);
+        assertThat(result.get(0).getUsername()).isEqualTo("최동근");
     }
 }
