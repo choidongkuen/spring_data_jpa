@@ -15,17 +15,15 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString(of = {"id", "name"})
 @Entity
-public class Team {
+public class Team extends BaseJpaEntity {
 
+    @OneToMany(mappedBy = "team")
+    private final List<Member> members = new ArrayList<>();
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "team_id")
     private Long id;
-
     private String name;
-
-    @OneToMany(mappedBy = "team")
-    private final List<Member> members = new ArrayList<>();
 
     public Team(String name) {
         this.name = name;

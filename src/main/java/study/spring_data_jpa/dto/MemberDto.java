@@ -9,12 +9,10 @@ import lombok.Setter;
 @Builder
 public class MemberDto {
 
-    private Long id;
     private String username;
     private int age;
 
-    public MemberDto(Long id, String username, int age) {
-        this.id = id;
+    public MemberDto(String username, int age) {
         this.username = username;
         this.age = age;
     }

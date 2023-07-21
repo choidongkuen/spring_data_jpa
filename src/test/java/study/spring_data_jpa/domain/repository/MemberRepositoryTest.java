@@ -12,6 +12,7 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import study.spring_data_jpa.domain.entity.Member;
 import study.spring_data_jpa.domain.entity.Team;
+import study.spring_data_jpa.dto.MemberDto;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -175,5 +176,55 @@ class MemberRepositoryTest {
             System.out.println("====");
         }
         System.out.println("===");
+    }
+
+    @Test
+    public void queryHint() {
+        Member member1 = new Member("member1", 10);
+        memberRepository.save(member1);
+        entityManager.flush();
+        entityManager.clear();
+
+        Member member = this.memberRepository.findByUsernameIsLike("%m%");
+        System.out.println(member);
+    }
+
+    @Test
+    public void DtoProjectionTest() {
+        // when
+        this.memberRepository.save(new Member("USER_A", 20));
+        this.memberRepository.save(new Member("USER_A", 20));
+        this.memberRepository.save(new Member("USER_A", 20));
+        this.memberRepository.save(new Member("USER_A", 20));
+        this.memberRepository.save(new Member("USER_A", 20));
+
+        List<MemberDto> userA = this.memberRepository.findMemberDtoByUsername("USER_A");
+        System.out.println("===");
+    }
+
+    @Test
+    public void callCustom() {
+        List<Member> result = memberRepository.findMemberCustom();
+    }
+
+    @Test
+    @DisplayName("Base Entity TEST")
+    void jpaEventBaseEntity() throws InterruptedException {
+
+        // given
+        Member member = new Member("member1", 20);
+        memberRepository.save(member); // @PrePersist
+
+        Thread.sleep(100); // 0.1초
+        member.setUsername("member2"); // @PreUpdate
+
+        entityManager.flush();
+        entityManager.clear();
+        // when
+        Member foundMember = memberRepository.findById(member.getId()).get();
+        // then
+
+        System.out.println("foundMember.getCreatedAt() = " + foundMember.getCreatedAt());
+        System.out.println("foundMember.getUpdatedAt() = " + foundMember.getUpdatedAt());
     }
 }

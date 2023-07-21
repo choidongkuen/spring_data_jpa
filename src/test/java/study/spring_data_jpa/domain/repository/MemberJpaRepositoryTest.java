@@ -19,6 +19,8 @@ class MemberJpaRepositoryTest {
 
     @Autowired
     MemberJpaRepository memberJpaRepository;
+    @Autowired
+    MemberQueryRepository memberQueryRepository;
 
     @Test
     public void jpaTest() {

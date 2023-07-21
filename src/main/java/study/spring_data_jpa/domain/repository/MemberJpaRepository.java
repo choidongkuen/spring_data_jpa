@@ -90,7 +90,6 @@ public class MemberJpaRepository {
         - 하나의 쿼리의 모든 직원의 나이를 + 1 (벌크성 수정 쿼리)
         - 반환타입(int) : 수정 성공한 레코드 개수
      */
-
     public int bulkAgePlus(int age) {
         return em.createQuery("update Member m " +
                         "set m.age = m.age + 1" +

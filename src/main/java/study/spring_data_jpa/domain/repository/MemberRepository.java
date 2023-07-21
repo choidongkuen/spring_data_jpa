@@ -2,19 +2,18 @@ package study.spring_data_jpa.domain.repository;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.EntityGraph;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 import study.spring_data_jpa.domain.entity.Member;
+import study.spring_data_jpa.domain.repository.custom.MemberRepositoryCustom;
 import study.spring_data_jpa.dto.MemberDto;
 
+import javax.persistence.QueryHint;
 import java.util.List;
 
 
 // command + e + enter
-public interface MemberRepository extends JpaRepository<Member, Long> {
+public interface MemberRepository extends JpaRepository<Member, Long>, MemberRepositoryCustom {
 
     // select m from Member m where m.username = :username and m.age > :age
     List<Member> findTop1ByUsernameAndAgeGreaterThan(String username, int age);
@@ -28,9 +27,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     @Query("select m.username from Member m")
     List<String> findAllByUsernameWithNamedQuery();
-
-    @Query("select new study.spring_data_jpa.dto.MemberDto(m.id,m.username,m.age) from Member m")
-    List<MemberDto> findMemberDto();
 
     // 컬렉션 바인딩
     @Query("select m from Member m where m.username in :names")
@@ -54,4 +50,12 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     @EntityGraph(attributePaths = {"team"})
     Member findEntityGraphByUsername(String username);
+
+    @QueryHints(value = @QueryHint(name = "org.hibernate.readOnly", value = "true"))
+    Member findReadOnlyByUsername(String username);
+
+    Member findByUsernameIsLike(String username);
+
+    @Query("select new study.spring_data_jpa.dto.MemberDto(m.username,m.age) from Member m where m.username = :username")
+    List<MemberDto> findMemberDtoByUsername(@Param("username") String username);
 }
